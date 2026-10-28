@@ -47,7 +47,7 @@ import MovieSearch from '../components/MovieSearch.vue'
 import MovieList from '../components/MovieList.vue'
 import MovieDetails from '../components/MovieDetails.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
-import { searchMovies, getMovieDetails } from '../services/movieApi'
+import { searchMovies, getMovieDetails } from '../services/movieAPI'
 
 const movies = ref([])
 const selectedMovie = ref(null)
