@@ -1,65 +1,81 @@
 <template>
-      <v-container class="pa-8">
-        <v-row>
-          <v-col cols="12">
-            <h1 class="text-h3 mb-6 text-center">🎬 Buscador de Películas</h1>
-          </v-col>
-        </v-row>
+  <v-container class="pa-8">
+    <v-row>
+      <v-col cols="12">
+        <h1 class="text-h3 mb-6 text-center">
+          🎬 Buscador de Películas
+        </h1>
+      </v-col>
+    </v-row>
 
-        <v-row>
-          <v-col cols="12" md="4">
-            <movie-search 
-              @search-movies="handleSearch"
-              @clear-results="handleClear"
-            />
-          </v-col>
+    <v-row>
+      <v-col cols="12" md="4">
+        <movie-search
+          @search-movies="handleSearch"
+          @clear-results="handleClear"
+        />
+      </v-col>
 
-          <v-col cols="12" md="8">
-            <loading-spinner :loading="loading" />
-            
-            <movie-list 
-              v-if="movies.length > 0"
-              :movies="movies"
-              @select-movie="handleMovieSelect"
-            />
+      <v-col cols="12" md="8">
+        <loading-spinner :loading="loading" />
 
-            <movie-details 
-              v-if="selectedMovie"
-              :movie="selectedMovie"
-              @close-details="handleCloseDetails"
-            />
+        <movie-list
+          v-if="movies.length > 0"
+          :movies="movies"
+          @select-movie="handleMovieSelect"
+        />
 
-            <v-alert
-              v-if="error"
-              type="error"
-              class="mt-4"
-            >
-              {{ error }}
-            </v-alert>
-          </v-col>
-        </v-row>
-      </v-container>
-    </template>
+        <movie-details
+          v-if="selectedMovie"
+          :movie="selectedMovie"
+          @close-details="handleCloseDetails"
+        />
+
+        <v-alert
+          v-if="error"
+          type="error"
+          class="mt-4"
+        >
+          {{ error }}
+        </v-alert>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+
 import MovieSearch from '../components/MovieSearch.vue'
 import MovieList from '../components/MovieList.vue'
 import MovieDetails from '../components/MovieDetails.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
-import { searchMovies, getMovieDetails } from '../services/movieAPI'
 
+import {
+  searchMovies,
+  getMovieDetails
+} from '../services/movieAPI'
+
+// Estado reactivo
 const movies = ref([])
 const selectedMovie = ref(null)
 const loading = ref(false)
 const error = ref('')
 
+// Hook de ciclo de vida
+onMounted(() => {
+  document.title = 'Buscador de Películas'
+})
+
+// Buscar películas
 const handleSearch = async (searchParams) => {
   loading.value = true
   error.value = ''
-  
+  selectedMovie.value = null
+
   try {
     const response = await searchMovies(searchParams)
+
     if (response.Search) {
       movies.value = response.Search
     } else {
@@ -74,8 +90,11 @@ const handleSearch = async (searchParams) => {
   }
 }
 
+
 const handleMovieSelect = async (imdbID) => {
   loading.value = true
+  error.value = ''
+
   try {
     selectedMovie.value = await getMovieDetails(imdbID)
   } catch (err) {
